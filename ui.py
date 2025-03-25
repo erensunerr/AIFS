@@ -1,6 +1,12 @@
 import streamlit as st
 from agent import run_agent, proactive
 from tools.display_item import extract_display_items
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,  # or DEBUG
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
 
 st.set_page_config(page_title="AIFS – AI Fashion Stylist", page_icon="🧥")
 st.title("🧥 AI Fashion Stylist (AIFS)")
@@ -15,8 +21,13 @@ for msg in st.session_state.messages:
         st.markdown(msg["content"])
         if "suggested_items" in msg and msg["suggested_items"]:
             st.subheader("🛍️ Suggested Items")
-            for item in msg["suggested_items"]:
-                st.image(item["img_path"], width=200, caption=item["title"])
+            num_cols = min(3, len(msg["suggested_items"]))
+            cols = st.columns(num_cols)
+
+            for i, item in enumerate(msg["suggested_items"]):
+                with cols[i % num_cols]:
+                    st.image(item["img_path"], use_container_width=True)
+                    st.caption(item["title"])
 
 # Handle user input
 if user_input := st.chat_input("What are you looking for today?"):
@@ -27,8 +38,6 @@ if user_input := st.chat_input("What are you looking for today?"):
 
     # Call the agent
     response = run_agent(user_input)
-
-    print(response)
 
     final_msg = response["messages"][-1].content
     st.session_state.messages.append({

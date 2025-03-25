@@ -6,6 +6,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_core.tools import tool
 from dotenv import load_dotenv
 from langchain_core.messages import ToolMessage, AIMessage, HumanMessage
+import logging
 
 load_dotenv()
 
@@ -24,6 +25,9 @@ def display_item_tool(items: list[DisplayItemInput]) -> None:
     Example:
         display_item([{"clothing_id": "123", "title": "Beautiful Dress"}, {"clothing_id": "456", "title": "Stylish Jacket"}])
     """
+    logging.info(f"Displaying {len(items)} clothing items")
+    for item in items:
+        logging.info(f"Item ID: {item.clothing_id}, Title: {item.title}")
     return None
 
 def extract_display_items(messages):

@@ -5,22 +5,12 @@ from dotenv import load_dotenv
 import logging
 from prompts import get_prompt
 
-# Configure logging
-logging.basicConfig(
-    # level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
-
 load_dotenv()
 
 client = OpenAI()
 
 def describe_image(image_path: str, context_dump : str = "") -> str:
-    logger.info(f"Describing image: {image_path} with context: {context_dump}.")
+    logging.info(f"Describing image: {image_path} with context: {context_dump}.")
     with open(image_path, "rb") as f:
         image_data = base64.b64encode(f.read()).decode("utf-8")
 
@@ -37,6 +27,6 @@ def describe_image(image_path: str, context_dump : str = "") -> str:
         ]
     )
 
-    logger.info(f"Image description: {response.choices[0].message.content.strip()}")
+    logging.info(f"Image description: {response.choices[0].message.content.strip()}")
 
     return response.choices[0].message.content.strip()
