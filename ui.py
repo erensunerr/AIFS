@@ -1,64 +1,58 @@
-
 import streamlit as st
 from agent import run_agent, proactive
-from langchain_core.messages import ToolMessage, AIMessage
+from tools.display_item import extract_display_items
 
 st.set_page_config(page_title="AIFS – AI Fashion Stylist", page_icon="🧥")
-
 st.title("🧥 AI Fashion Stylist (AIFS)")
 
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display chat messages
+# Display chat history (text only — no image parsing here)
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
+        if "suggested_items" in msg and msg["suggested_items"]:
+            st.subheader("🛍️ Suggested Items")
+            for item in msg["suggested_items"]:
+                st.image(item["img_path"], width=200, caption=item["title"])
 
-# Input for user message
+# Handle user input
 if user_input := st.chat_input("What are you looking for today?"):
-    # Append user message
+    # Add user message to history and UI
     st.session_state.messages.append({"role": "user", "content": user_input})
-
-    # Display user message
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    # Display agent response
-    with st.chat_message("assistant"):
-        with st.status("🧠 AIFS is thinking...", state="running") as status:
-            response = run_agent(user_input)
+    # Call the agent
+    response = run_agent(user_input)
 
-            # Extract final message content
-            final_msg = response["messages"][-1].content
+    print(response)
 
-            # Detect tool usage
-            used_tools = set()
+    final_msg = response["messages"][-1].content
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": final_msg,
+        "suggested_items": extract_display_items(response["messages"])
+    })
 
-            for msg in response["messages"]:
-                if isinstance(msg, AIMessage):
-                    for call in msg.tool_calls or []:
-                        used_tools.add(call.get("name", "Unknown Tool"))
+    st.rerun()
 
-            for tool_name in used_tools:
-                status.write(f"🔧 Tool used: `{tool_name}`", state="running")
-
-            status.update(label="✅ AIFS has responded", state="complete")
-
-        # Show final assistant reply
-        st.session_state.messages.append({"role": "assistant", "content": final_msg})
-        st.markdown(final_msg)
-
+# Handle proactive admin messages
 with st.sidebar:
     st.header("👩‍💼 Admin Panel")
     admin_input = st.text_area("Proactive Prompt", placeholder="e.g. Summer collection is in – suggest an outfit")
+
     if st.button("Send Proactive Message"):
         if admin_input.strip():
             with st.chat_message("admin"):
                 st.markdown(f"📣 *Admin Triggered:* {admin_input}")
+
             response = proactive(admin_input)
-            st.session_state.messages.append({"role": "assistant", "content": response['messages'][-1].content})
+            final_msg = response["messages"][-1].content
+            st.session_state.messages.append({"role": "assistant", "content": final_msg, "suggested_items": extract_display_items(response["messages"])})
+
             st.rerun()
         else:
             st.warning("Please enter a proactive message.")

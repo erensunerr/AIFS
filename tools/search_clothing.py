@@ -1,5 +1,3 @@
-# tools/search_clothing.py
-
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain_core.tools import tool
@@ -10,6 +8,7 @@ load_dotenv()
 VECTOR_DIR = "data/clothing_vectors"
 
 def search_clothing(description: str, k: int = 3):
+    print("Searching clothing...")
     embedding = OpenAIEmbeddings()
     vector_store = Chroma(
         persist_directory=VECTOR_DIR,
@@ -34,6 +33,6 @@ def search_clothing_tool(description: str) -> str:
         return "Sorry, I couldn't find any clothing that matches that description."
 
     return "\n\n".join([
-        f"ID: {doc.metadata['clothing_id']}\nDescription: {doc.page_content}"
+        f"clothing_id: {doc.metadata['clothing_id']}\nDescription: {doc.page_content}"
         for doc in results
     ])
