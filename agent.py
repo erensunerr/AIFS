@@ -5,19 +5,14 @@ from langgraph.checkpoint.memory import MemorySaver
 
 from prompts import get_prompt
 
-# # Import your tools
-# from tools.search_clothing import search_clothing
-# from tools.mention_clothing import mention_clothing
-# from tools.link_clothing_description import link_clothing_description
-# from tools.proactive import proactive
-# from tools.describe_image import describe_image
+from tools.search_clothing import search_clothing_tool
 
 load_dotenv()
 
 llm = init_chat_model("gpt-4o-mini", model_provider="openai")
 
 tools = [
-
+    search_clothing_tool
 ]
 
 memory = MemorySaver()
@@ -45,6 +40,6 @@ def proactive(admin_prompt: str):
     return aifs_agent.invoke(
         {
             "messages": [
-                ("admin", admin_prompt)
+                ("user", f"ADMIN_TRIGGER: {admin_prompt}")
             ]
         }, config)
