@@ -11,10 +11,12 @@ pip install -r requirements.txt
 playwright install
 ```
 
-Download the dataset and put it in AIFS/kaggle-dataset.
-Create data/images and data/articles.csv (from AIFS/kaggle-dataset).
+- Download the dataset and put it in AIFS/kaggle-dataset and unzip it.
+- Create data/images and data/articles.csv (from AIFS/kaggle-dataset).
 
 Add your OPENAI_API_KEY to the .env file.
+
+- Sample some images and run serve :)
 
 ## Usage
 
@@ -55,4 +57,4 @@ python main.py sample 50
 
 The system integrates LangGraph and LangChain for conversation management, specialized tools for search and display functionalities, OpenAI-powered Chroma for vector embedding storage, and a Streamlit interface for the interactive conversational experience with visual elements.
 
-![AIFS Architecture](AIFS Architecture.png)
+![AIFS Architecture](architecture.png)
