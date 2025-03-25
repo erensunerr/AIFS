@@ -14,6 +14,8 @@ playwright install
 Download the dataset and put it in AIFS/kaggle-dataset.
 Create data/images and data/articles.csv (from AIFS/kaggle-dataset).
 
+Add your OPENAI_API_KEY to the .env file.
+
 ## Usage
 
 Launch the fashion assistant interface:
